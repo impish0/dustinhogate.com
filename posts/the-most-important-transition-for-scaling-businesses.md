@@ -26,7 +26,7 @@ I hope you like it.
 
 ***PPS -*** If you're in the asphalt, striping, or seal coating world and want help scaling your business, Cam Roberts works 1-on-1 with operators like you.
 
-[**Check out Cam Roberts here**.](https://stripeitacademy.com/?ref=dustinhogate.com)
+[Check out Cam Roberts here](https://stripeitacademy.com/?ref=dustinhogate.com)
 ---
 ## Separation of Sales and Operations - Cam Roberts
 
