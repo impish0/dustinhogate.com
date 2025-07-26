@@ -5,7 +5,7 @@ import shutil
 import json
 from pathlib import Path
 from parser import parse_frontmatter, markdown_to_html, get_post_date, extract_headings, generate_toc, add_heading_ids
-from templates import post_template, index_template, category_template
+from templates import post_template, index_template, category_template, error_404_template
 from rss_generator import generate_rss
 from sitemap_generator import generate_sitemap
 import re
@@ -380,7 +380,11 @@ Allow: /
 Sitemap: {config['site_url']}/sitemap.xml"""
     with open('output/robots.txt', 'w', encoding='utf-8') as f:
         f.write(robots_txt)
-    
+
+    # Generate 404.html
+    error_404_html = error_404_template(config)
+    with open('output/404.html', 'w', encoding='utf-8') as f:
+        f.write(error_404_html)    
     # Copy static assets
     copy_errors = []
     
@@ -483,6 +487,7 @@ Sitemap: {config['site_url']}/sitemap.xml"""
     print("✓ Generated rss.xml")
     print("✓ Generated sitemap.xml")
     print("✓ Generated search-index.json")
+    print("✓ Generated 404.html")
     print("✓ Copied CSS files")
     print("\nSite built successfully in 'output' directory!")
     return True
