@@ -2,10 +2,12 @@
     "site_title": "Dustin Hogate",
     "site_url": "https://dustinhogate.com",
     "site_description": "Personal blog about technology, programming, and life.",
-    "author": "Me",
+    "author": "Dustin Hogate",
     "footer_text": "© 2025 | Built with 🔥 by Dustin Hogate - This blog was built using <a href=\"https://github.com/impish0/Tailoza\">Tailoza</a>",
     "theme": "dark",
     "posts_per_page": 20,
     "timezone": "+0000",
-    "post_url_prefix": "/"
+    "post_url_prefix": "/",
+    "plausible_domain": "dustinhogate.com",
+    "plausible_options": ["hash", "outbound-links", "file-downloads", "404", "custom-events"]
 }

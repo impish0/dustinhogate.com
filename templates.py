@@ -14,15 +14,15 @@ def generate_pagination_html(pagination, base_url=''):
         if base_url:
             # For category pages
             if page_num == 1:
-                return f"../{base_url}.html"
+                return f"../" 
             else:
-                return f"{page_num}.html" if current > 1 else f"{base_url}/{page_num}.html"
+                return f"../{page_num}/" if current > 1 else f"../{base_url}/{page_num}/"
         else:
             # For index pages
             if page_num == 1:
-                return "index.html" if current > 1 else "#"
+                return "../" if current > 1 else "#"
             else:
-                return f"page/{page_num}.html" if current == 1 else f"{page_num}.html"
+                return f"../page/{page_num}/" if current == 1 else f"../{page_num}/"
     
     html_parts = ['<nav class="pagination">']
     
@@ -143,6 +143,9 @@ def post_template(title, content, date, description="", keywords="", author="", 
     {f'<link rel="icon" type="image/png" href="../favicon.png">' if config.get('favicon') == 'favicon.png' else ''}
     {f'<link rel="icon" type="image/svg+xml" href="../favicon.svg">' if config.get('favicon') == 'favicon.svg' else ''}
     
+    <!-- Plausible Analytics -->
+    {f'<script defer data-domain="{html.escape(config["plausible_domain"], quote=True)}" src="{config.get("plausible_script_url", "https://plausible.io/js/script.js")}"></script>' if config.get('plausible_domain') else ''}
+    
     <!-- Structured Data -->
     <script type="application/ld+json">
     {{
@@ -181,7 +184,7 @@ def post_template(title, content, date, description="", keywords="", author="", 
                 <time datetime="{date}">{date}</time>
                 {f' • <span class="reading-time">{reading_time} min read</span>' if reading_time else ''}
                 {f' • <span class="author">{safe_author}</span>' if author else ''}
-                {' • <span class="categories">' + ', '.join([f'<a href="../categories/{html.escape(cat.lower().replace(" ", "-"), quote=True)}.html">{html.escape(cat)}</a>' for cat in categories]) + '</span>' if categories else ''}
+                {' • <span class="categories">' + ', '.join([f'<a href="../categories/{html.escape(cat.lower().replace(" ", "-"), quote=True)}/">{html.escape(cat)}</a>' for cat in categories]) + '</span>' if categories else ''}
             </div>
             {toc}
             {content}
@@ -205,14 +208,14 @@ def index_template(posts, config, categories=None, pagination=None, post_prefix=
     for post in posts:
         categories_html = ""
         if post.get('categories'):
-            category_links = [f'<a href="categories/{html.escape(cat.lower().replace(" ", "-"), quote=True)}.html">{html.escape(cat)}</a>' for cat in post['categories']]
+            category_links = [f'<a href="categories/{html.escape(cat.lower().replace(" ", "-"), quote=True)}/">{html.escape(cat)}</a>' for cat in post['categories']]
             categories_html = f' • <span class="categories">{", ".join(category_links)}</span>'
         
         reading_time_html = f' • <span class="reading-time">{post.get("reading_time", 1)} min read</span>' if post.get("reading_time") else ''
         
         post_list += f"""
         <article class="post-preview">
-            <h2><a href="{post_prefix}/{html.escape(post['filename'], quote=True) if post_prefix else html.escape(post['filename'], quote=True)}">{html.escape(post['title'])}</a></h2>
+            <h2><a href="{post_prefix + '/' + html.escape(post['filename'], quote=True) + '/' if post_prefix else html.escape(post['filename'], quote=True) + '/'}">{html.escape(post['title'])}</a></h2>
             <time datetime="{post['date']}">{post['date']}</time>{reading_time_html}{categories_html}
             {f"<p>{html.escape(post['description'])}</p>" if post.get('description') else ""}
         </article>"""
@@ -222,7 +225,7 @@ def index_template(posts, config, categories=None, pagination=None, post_prefix=
     if categories:
         category_items = []
         for category in categories:
-            category_url = f"categories/{html.escape(category.lower().replace(' ', '-'), quote=True)}.html"
+            category_url = f"categories/{html.escape(category.lower().replace(' ', '-'), quote=True)}/"
             category_items.append(f'<a href="{category_url}">{html.escape(category)}</a>')
         
         category_nav = f'''<div class="dropdown">
@@ -245,6 +248,9 @@ def index_template(posts, config, categories=None, pagination=None, post_prefix=
     {f'<link rel="icon" type="image/x-icon" href="favicon.ico">' if config.get('favicon') == 'favicon.ico' else ''}
     {f'<link rel="icon" type="image/png" href="favicon.png">' if config.get('favicon') == 'favicon.png' else ''}
     {f'<link rel="icon" type="image/svg+xml" href="favicon.svg">' if config.get('favicon') == 'favicon.svg' else ''}
+    
+    <!-- Plausible Analytics -->
+    {f'<script defer data-domain="{html.escape(config["plausible_domain"], quote=True)}" src="{config.get("plausible_script_url", "https://plausible.io/js/script.js")}"></script>' if config.get('plausible_domain') else ''}
 </head>
 <body>
     <header>
@@ -263,7 +269,7 @@ def index_template(posts, config, categories=None, pagination=None, post_prefix=
         {generate_pagination_html(pagination) if pagination else ''}
     </main>
     <footer>
-        <p>{config['footer_text']}</p>
+        <p>{config.get('footer_text_html', html.escape(config.get('footer_text', '')))}</p>
     </footer>
     
     <!-- Search overlay -->
@@ -292,7 +298,7 @@ def category_template(category_name, posts, config, pagination=None, post_prefix
         
         post_list += f"""
         <article class="post-preview">
-            <h2><a href="../{post_prefix}/{html.escape(post['filename'], quote=True) if post_prefix else '../' + html.escape(post['filename'], quote=True)}">{html.escape(post['title'])}</a></h2>
+            <h2><a href="{'../' + post_prefix + '/' + html.escape(post['filename'], quote=True) + '/' if post_prefix else '../' + html.escape(post['filename'], quote=True) + '/'}">{html.escape(post['title'])}</a></h2>
             <time datetime="{post['date']}">{post['date']}</time>{reading_time_html}
             {f"<p>{html.escape(post['description'])}</p>" if post.get('description') else ""}
         </article>"""
@@ -311,6 +317,9 @@ def category_template(category_name, posts, config, pagination=None, post_prefix
     {f'<link rel="icon" type="image/x-icon" href="../favicon.ico">' if config.get('favicon') == 'favicon.ico' else ''}
     {f'<link rel="icon" type="image/png" href="../favicon.png">' if config.get('favicon') == 'favicon.png' else ''}
     {f'<link rel="icon" type="image/svg+xml" href="../favicon.svg">' if config.get('favicon') == 'favicon.svg' else ''}
+    
+    <!-- Plausible Analytics -->
+    {f'<script defer data-domain="{html.escape(config["plausible_domain"], quote=True)}" src="{config.get("plausible_script_url", "https://plausible.io/js/script.js")}"></script>' if config.get('plausible_domain') else ''}
 </head>
 <body>
     <header>
@@ -326,7 +335,7 @@ def category_template(category_name, posts, config, pagination=None, post_prefix
         {generate_pagination_html(pagination, pagination.get('category_slug') if pagination else None) if pagination else ''}
     </main>
     <footer>
-        <p>{config['footer_text']}</p>
+        <p>{config.get('footer_text_html', html.escape(config.get('footer_text', '')))}</p>
     </footer>
 </body>
 </html>"""

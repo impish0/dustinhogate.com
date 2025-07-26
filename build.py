@@ -9,6 +9,42 @@ from templates import post_template, index_template, category_template
 from rss_generator import generate_rss
 from sitemap_generator import generate_sitemap
 import re
+import html
+from plausible_helper import build_plausible_script_url
+
+def process_config_html(text):
+    """Safely process HTML links in config text while escaping other content"""
+    if not text:
+        return ''
+    
+    # Extract safe HTML patterns before escaping
+    # Pattern for basic links: <a href="url">text</a>
+    link_pattern = r'<a href="([^"]+)">([^<]+)</a>'
+    links = []
+    
+    def extract_link(match):
+        url = match.group(1)
+        link_text = match.group(2)
+        # Store the link with a placeholder
+        placeholder = f'__LINK_{len(links)}__'
+        links.append((url, link_text))
+        return placeholder
+    
+    # Extract links and replace with placeholders
+    text_with_placeholders = re.sub(link_pattern, extract_link, text)
+    
+    # Escape everything else
+    escaped_text = html.escape(text_with_placeholders)
+    
+    # Restore links as proper HTML
+    for i, (url, link_text) in enumerate(links):
+        placeholder = f'__LINK_{i}__'
+        safe_url = html.escape(url, quote=True)
+        safe_link_text = html.escape(link_text)
+        proper_link = f'<a href="{safe_url}">{safe_link_text}</a>'
+        escaped_text = escaped_text.replace(placeholder, proper_link)
+    
+    return escaped_text
 
 def validate_config(config):
     """Validate configuration values"""
@@ -36,7 +72,9 @@ def load_config():
         "author": "Your Name",
         "footer_text": "Built with a simple static site generator",
         "posts_per_page": 20,
-        "timezone": "+0000"
+        "timezone": "+0000",
+        "plausible_domain": "",
+        "plausible_options": []
     }
     
     config_path = Path('config.json')
@@ -48,7 +86,18 @@ def load_config():
         except (json.JSONDecodeError, IOError) as e:
             print(f"Warning: Could not load config.json: {e}")
     
-    return validate_config(default_config)
+    validated_config = validate_config(default_config)
+    
+    # Process HTML in footer_text if it exists
+    if 'footer_text' in validated_config:
+        validated_config['footer_text_html'] = process_config_html(validated_config['footer_text'])
+    
+    # Build Plausible script URL if domain is set
+    if validated_config.get('plausible_domain'):
+        plausible_options = validated_config.get('plausible_options', [])
+        validated_config['plausible_script_url'] = build_plausible_script_url(plausible_options)
+    
+    return validated_config
 
 def generate_search_index(posts, config):
     """Generate search index for client-side search"""
@@ -67,7 +116,7 @@ def generate_search_index(posts, config):
             'title': post['title'],
             'description': post.get('description', ''),
             'content': text_content,
-            'url': f'{post_url_path}{post["filename"]}',
+            'url': f'{post_url_path}{post["filename"]}/',  # Add trailing slash for directory URLs
             'date': post['date'],
             'categories': post.get('categories', []),
             'reading_time': post.get('reading_time', 1)
@@ -194,15 +243,17 @@ def build_site():
                     toc_html = generate_toc(headings)
                     html_content = add_heading_ids(html_content, headings)
             
-            # Generate HTML filename
-            html_filename = filename.replace('.md', '.html')
+            # Generate directory name for clean URLs (no .html extension)
+            post_dir_name = filename.replace('.md', '')
             
             # Create post HTML
-            post_url = f"{config['site_url']}/{post_url_path}{html_filename}"
+            post_url = f"{config['site_url']}/{post_url_path}{post_dir_name}/"
             post_html = post_template(title, html_content, date, description, keywords, author, image, toc_html, post_url, config, post_categories, reading_time, post_prefix)
             
-            # Write post HTML file
-            with open(Path(post_output_dir) / html_filename, 'w', encoding='utf-8') as f:
+            # Create post directory and write index.html inside it
+            post_directory = Path(post_output_dir) / post_dir_name
+            post_directory.mkdir(parents=True, exist_ok=True)
+            with open(post_directory / 'index.html', 'w', encoding='utf-8') as f:
                 f.write(post_html)
             
             # Add to posts list for index and RSS
@@ -210,7 +261,7 @@ def build_site():
                 'title': title,
                 'date': date,
                 'description': description,
-                'filename': html_filename,
+                'filename': post_dir_name,  # Now stores directory name instead of .html filename
                 'content': html_content,
                 'categories': post_categories,
                 'reading_time': reading_time
@@ -224,7 +275,7 @@ def build_site():
                     'title': title,
                     'date': date,
                     'description': description,
-                    'filename': html_filename,
+                    'filename': post_dir_name,  # Now stores directory name instead of .html filename
                     'reading_time': reading_time
                 })
             
@@ -259,9 +310,10 @@ def build_site():
             with open('output/index.html', 'w', encoding='utf-8') as f:
                 f.write(index_html)
         else:
-            # Create page directory
-            Path('output/page').mkdir(exist_ok=True)
-            with open(f'output/page/{page_num + 1}.html', 'w', encoding='utf-8') as f:
+            # Create page directory with index.html inside
+            page_dir = Path('output/page') / str(page_num + 1)
+            page_dir.mkdir(parents=True, exist_ok=True)
+            with open(page_dir / 'index.html', 'w', encoding='utf-8') as f:
                 f.write(index_html)
     
     # Generate category pages with pagination
@@ -292,14 +344,16 @@ def build_site():
             category_html = category_template(category_name, page_posts, config, pagination_info, post_prefix)
             
             if page_num == 0:
-                # First page at regular location
-                with open(Path('output/categories') / f'{category_slug}.html', 'w', encoding='utf-8') as f:
+                # First page - create category directory with index.html
+                category_dir = Path('output/categories') / category_slug
+                category_dir.mkdir(parents=True, exist_ok=True)
+                with open(category_dir / 'index.html', 'w', encoding='utf-8') as f:
                     f.write(category_html)
             else:
-                # Additional pages in subdirectory
-                category_page_dir = Path('output/categories') / category_slug
-                category_page_dir.mkdir(exist_ok=True)
-                with open(category_page_dir / f'{page_num + 1}.html', 'w', encoding='utf-8') as f:
+                # Additional pages - create numbered subdirectory with index.html
+                category_page_dir = Path('output/categories') / category_slug / str(page_num + 1)
+                category_page_dir.mkdir(parents=True, exist_ok=True)
+                with open(category_page_dir / 'index.html', 'w', encoding='utf-8') as f:
                     f.write(category_html)
     
     print(f"✓ Generated {len(categories)} category pages")

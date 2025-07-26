@@ -22,10 +22,10 @@ def generate_rss(posts, blog_title, blog_url, blog_description, timezone="+0000"
         item = ET.SubElement(channel, "item")
         # ElementTree automatically escapes XML special characters
         ET.SubElement(item, "title").text = post['title']
-        ET.SubElement(item, "link").text = f"{blog_url}/{post_url_path}{post['filename']}"
+        ET.SubElement(item, "link").text = f"{blog_url}/{post_url_path}{post['filename']}/"
         ET.SubElement(item, "description").text = post.get('description', post['title'])
         ET.SubElement(item, "pubDate").text = format_rss_date(post['date'], timezone)
-        ET.SubElement(item, "guid").text = f"{blog_url}/{post_url_path}{post['filename']}"
+        ET.SubElement(item, "guid").text = f"{blog_url}/{post_url_path}{post['filename']}/"
     
     # Pretty print XML
     rough_string = ET.tostring(rss, encoding='unicode')

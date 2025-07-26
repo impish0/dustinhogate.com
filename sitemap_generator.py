@@ -23,7 +23,7 @@ def generate_sitemap(posts, config):
     for post in posts:
         url = ET.SubElement(urlset, "url")
         # ElementTree automatically escapes XML special characters
-        ET.SubElement(url, "loc").text = f"{config['site_url']}/{post_url_path}{post['filename']}"
+        ET.SubElement(url, "loc").text = f"{config['site_url']}/{post_url_path}{post['filename']}/"
         ET.SubElement(url, "lastmod").text = post['date']
         ET.SubElement(url, "changefreq").text = "monthly"
         ET.SubElement(url, "priority").text = "0.8"
@@ -37,7 +37,7 @@ def generate_sitemap(posts, config):
     for category in categories:
         url = ET.SubElement(urlset, "url")
         category_slug = category.lower().replace(' ', '-')
-        ET.SubElement(url, "loc").text = f"{config['site_url']}/categories/{category_slug}.html"
+        ET.SubElement(url, "loc").text = f"{config['site_url']}/categories/{category_slug}/"
         ET.SubElement(url, "lastmod").text = datetime.now().strftime("%Y-%m-%d")
         ET.SubElement(url, "changefreq").text = "weekly"
         ET.SubElement(url, "priority").text = "0.6"
