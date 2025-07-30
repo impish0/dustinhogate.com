@@ -343,7 +343,7 @@ def error_404_template(config):
     """Generate HTML for 404 error page"""
     theme = config.get('theme', 'light')
     
-    return f"""<\!DOCTYPE html>
+    return f"""<!DOCTYPE html>
 <html lang="en" data-theme="{theme}">
 <head>
     <meta charset="UTF-8">
@@ -356,7 +356,7 @@ def error_404_template(config):
     {f'<link rel="icon" type="image/png" href="favicon.png">' if config.get('favicon') == 'favicon.png' else ''}
     {f'<link rel="icon" type="image/svg+xml" href="favicon.svg">' if config.get('favicon') == 'favicon.svg' else ''}
     
-    <\!-- Plausible Analytics -->
+    <!-- Plausible Analytics -->
     {f'<script defer data-domain="{html.escape(config["plausible_domain"], quote=True)}" src="{config.get("plausible_script_url", "https://plausible.io/js/script.js")}"></script>' if config.get('plausible_domain') else ''}
     
     <style>
@@ -435,7 +435,7 @@ def error_404_template(config):
         <p>{config.get('footer_text_html', html.escape(config.get('footer_text', '')))}</p>
     </footer>
     
-    <\!-- Search overlay -->
+    <!-- Search overlay -->
     <div id="search-overlay" class="search-overlay">
         <div class="search-container">
             <div class="search-header">

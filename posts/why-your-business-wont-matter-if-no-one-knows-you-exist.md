@@ -39,7 +39,9 @@ I'm not saying this as a fluff piece to boost your ego if you already think this
 I want to ask a few questions, and I really want you to think about them.
 
 1. If you are the rare breed of human who truly believes that, through your work, you have the ability change even a small piece of peoples lives for the better - why are you allowing the world to ignore you?
+
 2. If you believe that what you offer will not only give people what they want, but you believe that you can be a positive force for good to them, why would you let those people get swindled by a conman whose only goal is to take their money and leave them more empty than than before?
+
 And another question.. if you DON'T believe that you, through your business, can have such impact, then why are you even doing it?
 If you truly believe in what you do, it's your responsibility to be relevant because everyone who doesn't know about you is going to choose someone else. Someone else is not you, and no one cares like you do - right?
 So, back to the first question. If you believe your business and dreams matter, what does irrelevant look like in three, five or ten years?
