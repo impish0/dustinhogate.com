@@ -112,3 +112,12 @@ The `config.json` file controls site-wide settings:
 - The parser.py handles Markdown conversion with performance optimizations
 - File watching in serve.py monitors posts/, assets/, images/, and core Python files
 - The build process is atomic - either succeeds completely or fails cleanly
+- No external dependencies or package management - uses only Python standard library
+- Draft posts (prefixed with `_`) are automatically excluded from builds
+
+## Error Handling
+
+The static site generator includes:
+- 404 error page generation at `/404.html`
+- Config validation in build.py to catch common configuration errors
+- Safe HTML processing for footer text with link preservation
