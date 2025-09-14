@@ -109,13 +109,47 @@ class FileWatcher:
         """Stop watching"""
         self.running = False
 
-class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-    """HTTP request handler that suppresses log messages for successful requests"""
+class CustomHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
+    """HTTP request handler with custom 404 page support"""
     
     def log_message(self, format, *args):
         # Only log errors (status codes >= 400)
         if len(args) >= 3 and isinstance(args[1], str) and args[1].startswith(('4', '5')):
             super().log_message(format, *args)
+    
+    def do_GET(self):
+        """Handle GET requests with custom 404 page"""
+        try:
+            # Check if the requested path exists
+            if self.path == '/':
+                self.path = '/index.html'
+            
+            # Remove leading slash and decode URL
+            file_path = self.path.lstrip('/')
+            
+            # Check if file exists
+            full_path = os.path.join(os.getcwd(), file_path)
+            
+            if os.path.exists(full_path) and os.path.isfile(full_path):
+                # File exists, serve it normally
+                return super().do_GET()
+            else:
+                # File doesn't exist, serve custom 404 page
+                self.send_response(404)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                
+                # Read and serve the 404.html page
+                try:
+                    with open('404.html', 'rb') as f:
+                        self.wfile.write(f.read())
+                except FileNotFoundError:
+                    # Fallback to simple 404 message if 404.html doesn't exist
+                    self.wfile.write(b'<html><body><h1>404 - Page Not Found</h1><p>The requested page could not be found.</p></body></html>')
+                
+        except Exception as e:
+            # Handle any errors gracefully
+            self.send_error(500, f"Internal server error: {e}")
     
     def handle(self):
         """Handle requests but suppress BrokenPipeError"""
@@ -164,7 +198,7 @@ def serve():
     watcher_thread.start()
     
     # Start HTTP server
-    Handler = QuietHTTPRequestHandler
+    Handler = CustomHTTPRequestHandler
     
     try:
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
