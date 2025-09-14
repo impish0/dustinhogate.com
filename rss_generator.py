@@ -4,9 +4,12 @@ import xml.etree.ElementTree as ET
 from xml.dom import minidom
 import html
 
-def generate_rss(posts, blog_title, blog_url, blog_description, timezone="+0000", post_prefix="posts"):
+def generate_rss(posts, blog_title, blog_url, blog_description, timezone="+0000", post_prefix="", rss_full_content=True):
     """Generate RSS feed from posts"""
-    rss = ET.Element("rss", version="2.0")
+    # Add content namespace for full content support
+    rss = ET.Element("rss", version="2.0", attrib={
+        "xmlns:content": "http://purl.org/rss/1.0/modules/content/"
+    })
     channel = ET.SubElement(rss, "channel")
     
     # Channel metadata - XML escaping is handled by ElementTree
@@ -26,6 +29,11 @@ def generate_rss(posts, blog_title, blog_url, blog_description, timezone="+0000"
         ET.SubElement(item, "description").text = post.get('description', post['title'])
         ET.SubElement(item, "pubDate").text = format_rss_date(post['date'], timezone)
         ET.SubElement(item, "guid").text = f"{blog_url}/{post_url_path}{post['filename']}/"
+        
+        # Add full content if enabled
+        if rss_full_content and 'content' in post:
+            content_encoded = ET.SubElement(item, "{http://purl.org/rss/1.0/modules/content/}encoded")
+            content_encoded.text = post['content']
     
     # Pretty print XML
     rough_string = ET.tostring(rss, encoding='unicode')

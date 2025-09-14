@@ -9,5 +9,6 @@
     "timezone": "+0000",
     "post_url_prefix": "/",
     "plausible_domain": "dustinhogate.com",
-    "plausible_options": ["hash", "outbound-links", "file-downloads", "404", "custom-events"]
+    "plausible_options": ["hash", "outbound-links", "file-downloads", "404", "custom-events"],
+    "rss_full_content": true
 }

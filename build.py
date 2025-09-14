@@ -359,7 +359,7 @@ def build_site():
     print(f"✓ Generated {len(categories)} category pages")
     
     # Generate RSS feed
-    rss_xml = generate_rss(posts, config['site_title'], config['site_url'], config['site_description'], config.get('timezone', '+0000'), post_prefix)
+    rss_xml = generate_rss(posts, config['site_title'], config['site_url'], config['site_description'], config.get('timezone', '+0000'), post_prefix, config.get('rss_full_content', True))
     with open('output/rss.xml', 'w', encoding='utf-8') as f:
         f.write(rss_xml)
     
