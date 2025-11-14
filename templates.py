@@ -285,7 +285,7 @@ def index_template(posts, config, categories=None, pagination=None, post_prefix=
         </div>
     </div>
     
-    <script src="assets/js/search.js"></script>
+    <script src="/assets/js/search.js"></script>
 </body>
 </html>"""
 
@@ -342,7 +342,7 @@ def category_template(category_name, posts, config, pagination=None, post_prefix
 def error_404_template(config):
     """Generate HTML for 404 error page"""
     theme = config.get('theme', 'light')
-    
+
     return f"""<!DOCTYPE html>
 <html lang="en" data-theme="{theme}">
 <head>
@@ -350,11 +350,12 @@ def error_404_template(config):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Page not found">
     <title>404 - Page Not Found | {html.escape(config['site_title'])}</title>
-    <link rel="stylesheet" href="assets/style.css">
-    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="rss.xml">
-    {f'<link rel="icon" type="image/x-icon" href="favicon.ico">' if config.get('favicon') == 'favicon.ico' else ''}
-    {f'<link rel="icon" type="image/png" href="favicon.png">' if config.get('favicon') == 'favicon.png' else ''}
-    {f'<link rel="icon" type="image/svg+xml" href="favicon.svg">' if config.get('favicon') == 'favicon.svg' else ''}
+    <link rel="stylesheet" href="/assets/style.css">
+    <link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/rss.xml">
+    <base href="/">
+    {f'<link rel="icon" type="image/x-icon" href="/favicon.ico">' if config.get('favicon') == 'favicon.ico' else ''}
+    {f'<link rel="icon" type="image/png" href="/favicon.png">' if config.get('favicon') == 'favicon.png' else ''}
+    {f'<link rel="icon" type="image/svg+xml" href="/favicon.svg">' if config.get('favicon') == 'favicon.svg' else ''}
     
     <!-- Plausible Analytics -->
     {f'<script defer data-domain="{html.escape(config["plausible_domain"], quote=True)}" src="{config.get("plausible_script_url", "https://plausible.io/js/script.js")}"></script>' if config.get('plausible_domain') else ''}
@@ -369,18 +370,18 @@ def error_404_template(config):
         .error-code {{
             font-size: 8rem;
             font-weight: bold;
-            color: var(--text-muted);
+            color: var(--muted-foreground);
             line-height: 1;
             margin-bottom: 1rem;
         }}
         .error-title {{
             font-size: 2rem;
             margin-bottom: 1rem;
-            color: var(--text-primary);
+            color: var(--foreground);
         }}
         .error-description {{
             font-size: 1.1rem;
-            color: var(--text-secondary);
+            color: var(--muted-foreground);
             margin-bottom: 2rem;
             line-height: 1.6;
         }}
@@ -394,28 +395,29 @@ def error_404_template(config):
             display: inline-block;
             padding: 0.75rem 1.5rem;
             background: var(--primary);
-            color: white;
+            color: var(--primary-foreground);
             text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.2s;
+            border-radius: var(--radius);
+            transition: background-color 0.2s, opacity 0.2s;
         }}
         .error-actions a:hover {{
-            background: var(--primary-dark);
+            opacity: 0.9;
         }}
         .error-actions a.secondary {{
             background: transparent;
             border: 1px solid var(--border);
-            color: var(--text-primary);
+            color: var(--foreground);
         }}
         .error-actions a.secondary:hover {{
-            background: var(--background-secondary);
+            background: var(--muted);
+            opacity: 1;
         }}
     </style>
 </head>
 <body>
     <header>
         <nav>
-            <a href="index.html">← Home</a>
+            <a href="/">← Home</a>
         </nav>
     </header>
     <main>
@@ -426,7 +428,7 @@ def error_404_template(config):
                 The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
             </p>
             <div class="error-actions">
-                <a href="index.html">← Back to Home</a>
+                <a href="/">← Back to Home</a>
                 <a href="#" id="search-toggle" class="secondary">Search Posts</a>
             </div>
         </div>
@@ -448,6 +450,6 @@ def error_404_template(config):
         </div>
     </div>
     
-    <script src="assets/js/search.js"></script>
+    <script src="/assets/js/search.js"></script>
 </body>
 </html>"""
