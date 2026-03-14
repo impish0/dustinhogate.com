@@ -1,0 +1,12 @@
+{
+    "site_title": "Dustin Hogate",
+    "site_url": "https://dustinhogate.com",
+    "site_description": "A minimal blog about things that matter.",
+    "author": "Dustin Hogate",
+    "footer_text": "© 2026 | Built with 🔥 by Dustin Hogate - This blog was built using <a href=\"https://github.com/impish0/Tailoza\" target=\"_blank\">Tailoza</a>",
+    "theme": "nord",
+    "posts_per_page": 20,
+    "timezone": "+0000",
+    "post_url_prefix": "/",
+    "rss_full_content": true
+}
